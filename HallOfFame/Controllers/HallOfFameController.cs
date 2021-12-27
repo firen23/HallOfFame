@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using HallOfFame.Data;
 using HallOfFame.Services;
-using HallOfFame.Models;
 using HallOfFame.Dtos;
 
 namespace HallOfFame.Controllers;
@@ -11,7 +10,7 @@ namespace HallOfFame.Controllers;
 public class HallOfFameController : ControllerBase
 {
     private readonly ILogger<HallOfFameController> _logger;
-    private readonly StorageService _service;
+    private readonly IStorageService _service;
     
     public HallOfFameController(ILogger<HallOfFameController> logger, HallOfFameContext context)
     {
@@ -25,15 +24,8 @@ public class HallOfFameController : ControllerBase
     {
         try
         {
-            var persons = await _service.GetPersonsWithSkills();
-
-            foreach (var person in persons)
-            {
-                person.Skills = _service.GetOldSkillRecords(person.Skills);
-            }
-            
-            var personsDto = persons.Select(person => new PersonDto(person)).ToList();
-            return Ok(personsDto);
+            var personsDtos = await _service.GetPersonsDtos();
+            return Ok(personsDtos);
         }
         catch (Exception e)
         {
@@ -50,8 +42,8 @@ public class HallOfFameController : ControllerBase
     {
         try
         {
-            var person = await _service.GetPersonWithSkills(id);
-            if (person is null)
+            var personDto = await _service.GetPersonDto(id);
+            if (personDto is null)
             {
                 _logger.LogError("{} {}: Person id: {} not found", 
                     Request.Method,
@@ -59,11 +51,7 @@ public class HallOfFameController : ControllerBase
                     id);
                 return NotFound();
             }
-            
-            person.Skills = _service.GetOldSkillRecords(person.Skills);
-            
-            var personDto = new PersonDto(person);
-        
+
             return Ok(personDto);
         }
         catch (Exception e)
@@ -81,8 +69,7 @@ public class HallOfFameController : ControllerBase
     {
         try
         {
-            var person = new Person(personDto);
-            await _service.AddPerson(person);
+            await _service.AddPersonDto(personDto);
             return Ok();
         }
         catch (Exception e)
@@ -100,9 +87,9 @@ public class HallOfFameController : ControllerBase
     {
         try
         {
-            var person = await _service.GetPersonWithSkills(id);
+            var isSuccess = await _service.UpdatePersonDto(personDto, id);
 
-            if (person is null)
+            if (!isSuccess)
             {
                 _logger.LogError("{} {}: Person id: {} not found",
                     Request.Method,
@@ -111,22 +98,6 @@ public class HallOfFameController : ControllerBase
                 return NotFound();
             }
         
-            var oldSkills = _service.GetOldSkillRecords(person.Skills);
-
-            person.Name = personDto.Name;
-            person.DisplayName = personDto.DisplayName;
-
-            foreach (var newSkill in personDto.Skills)
-            {
-                var skill = oldSkills
-                    .FirstOrDefault(s => s.Name == newSkill.Name && s.Level == newSkill.Level);
-                if (skill is null)
-                {
-                    person.Skills.Add(new Skill(newSkill));
-                }
-            }
-        
-            await _service.UpdatePerson(person);
             return Ok();
         }
         catch (Exception e)
@@ -145,9 +116,9 @@ public class HallOfFameController : ControllerBase
     {
         try
         {
-            var person = await _service.GetPerson(id);
+            var isSuccess = await _service.DeletePersonDto(id);
         
-            if (person is null)
+            if (!isSuccess)
             {
                 _logger.LogError("{} {}: Person id: {} not found",
                     Request.Method,
@@ -155,8 +126,7 @@ public class HallOfFameController : ControllerBase
                     id);
                 return NotFound();
             }
-        
-            await _service.DeletePerson(person);
+            
             return Ok();
         }
         catch (Exception e)
