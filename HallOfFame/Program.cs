@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using HallOfFame.Data;
+using HallOfFame.Services;
 
 namespace HallOfFame;
 
@@ -22,6 +23,7 @@ public static class Program
             builder.Services.AddControllers();
             builder.Services.AddDbContext<HallOfFameContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IStorageService, StorageService>();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "api", Version = "v1"});

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using HallOfFame.Data;
 using HallOfFame.Services;
 using HallOfFame.Dtos;
 
@@ -12,10 +11,10 @@ public class HallOfFameController : ControllerBase
     private readonly ILogger<HallOfFameController> _logger;
     private readonly IStorageService _service;
     
-    public HallOfFameController(ILogger<HallOfFameController> logger, HallOfFameContext context)
+    public HallOfFameController(ILogger<HallOfFameController> logger, IStorageService service)
     {
         _logger = logger;
-        _service = new StorageService(context);
+        _service = service;
     }
 
     /// <summary>
@@ -35,8 +34,8 @@ public class HallOfFameController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "{} {}: Unable to load persons",
-                Request.Method,
-                Request.Path.Value);
+                Request?.Method,
+                Request?.Path.Value);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
@@ -58,8 +57,8 @@ public class HallOfFameController : ControllerBase
             if (personDto is null)
             {
                 _logger.LogError("{} {}: Person id: {} not found", 
-                    Request.Method,
-                    Request.Path.Value,
+                    Request?.Method,
+                    Request?.Path.Value,
                     id);
                 return NotFound();
             }
@@ -69,8 +68,8 @@ public class HallOfFameController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "{} {}: Unable to load person",
-                Request.Method,
-                Request.Path.Value);
+                Request?.Method,
+                Request?.Path.Value);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
@@ -93,8 +92,8 @@ public class HallOfFameController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "{} {}: Failed to add Person", 
-                Request.Method,
-                Request.Path.Value);
+                Request?.Method,
+                Request?.Path.Value);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
@@ -118,8 +117,8 @@ public class HallOfFameController : ControllerBase
             if (!isSuccess)
             {
                 _logger.LogError("{} {}: Person id: {} not found",
-                    Request.Method,
-                    Request.Path.Value,
+                    Request?.Method,
+                    Request?.Path.Value,
                     id);
                 return NotFound();
             }
@@ -129,8 +128,8 @@ public class HallOfFameController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "{} {}: Failed to update Person id: {}", 
-                Request.Method,
-                Request.Path.Value,
+                Request?.Method,
+                Request?.Path.Value,
                 id);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
@@ -153,8 +152,8 @@ public class HallOfFameController : ControllerBase
             if (!isSuccess)
             {
                 _logger.LogError("{} {}: Person id: {} not found",
-                    Request.Method,
-                    Request.Path.Value,
+                    Request?.Method,
+                    Request?.Path.Value,
                     id);
                 return NotFound();
             }
@@ -164,8 +163,8 @@ public class HallOfFameController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "{} {}: Failed to delete Person id: {}", 
-                Request.Method,
-                Request.Path.Value,
+                Request?.Method,
+                Request?.Path.Value,
                 id);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
