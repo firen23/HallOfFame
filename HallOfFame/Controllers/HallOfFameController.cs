@@ -18,6 +18,11 @@ public class HallOfFameController : ControllerBase
         _service = new StorageService(context);
     }
 
+    /// <summary>
+    /// Gets the list of all <c>PersonDto</c> objects from the data source
+    /// </summary>
+    /// <returns>A status code 200 with List of <c>PersonDto</c> objects
+    /// or status code 500 if there was an internal error</returns>
     [Route("persons")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PersonDto>>> Get()
@@ -36,6 +41,13 @@ public class HallOfFameController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Gets the <c>PersonDto</c> object from the data source by unique ID.
+    /// </summary>
+    /// <param name="id">Person's ID</param>
+    /// <returns>A status code 200 with List of <c>PersonDto</c> objects,
+    /// status code 404 if person with that ID was not found
+    /// or status code 500 if there was an internal error.</returns>
     [Route("person/{id:long}")]
     [HttpGet]
     public async Task<ActionResult<PersonDto>> Get(long id)
@@ -63,6 +75,12 @@ public class HallOfFameController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Adds the <c>PersonDto</c> object to the data source.
+    /// </summary>
+    /// <param name="personDto">PersonDto object</param>
+    /// <returns>A status code 200
+    /// or status code 500 if there was an internal error.</returns>
     [Route("person")]
     [HttpPost]
     public async Task<ActionResult> Post(PersonDto personDto)
@@ -81,6 +99,14 @@ public class HallOfFameController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Updates the <c>PersonDto</c> object in the data source.
+    /// </summary>
+    /// <param name="personDto">PersonDto object</param>
+    /// <param name="id">Person's ID</param>
+    /// <returns>A status code 200,
+    /// status code 404 if person with that ID was not found
+    /// or status code 500 if there was an internal error.</returns>
     [Route("person/{id:long}")]
     [HttpPut]
     public async Task<ActionResult> Put(PersonDto personDto, long id)
@@ -110,6 +136,12 @@ public class HallOfFameController : ControllerBase
         }
     }
     
+    /// <summary>
+    /// Deletes the <c>PersonDto</c> object from the data source.
+    /// </summary>
+    /// <returns>A status code 200,
+    /// status code 404 if person with that ID was not found
+    /// or status code 500 if there was an internal error.</returns>
     [Route("person/{id:long}")]
     [HttpDelete]
     public async Task<ActionResult> Delete(long id)
